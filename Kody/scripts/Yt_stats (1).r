@@ -21,7 +21,7 @@ showtext_auto()
 
 options(scipen = 100)
 
-result <- fromJSON(file = "historia_oglądania.json")
+result <- fromJSON(file = "scripts/historia_oglądania.json")
 
 title = list('python')
 titleUrl = list('python')
@@ -48,29 +48,28 @@ df <- mutate(df, title = substr(df$title,12, nchar(df$title)))
 
 write_feather(df, "foobar.feather")
 
-dfP <- read.csv("Youtube_full_stats.csv")
-dfP2 <- read.csv("Youtube_full_stats2.csv", sep=";")
-dfP3 <- read.csv("Youtube_full_stats4000-8000_pawel.csv", sep=";")
+dfP <- read.csv("data/Youtube_full_stats.csv")
+dfP2 <- read.csv("data/Youtube_full_stats2.csv", sep=";")
+dfP3 <- read.csv("data/Youtube_full_stats4000-8000_pawel.csv", sep=";")
+dfP4 <- read.csv("data/Youtube_full_stats8000-12000.csv", sep=";")
 colnames(dfP2)[6] <- 'id'
-dfP <- rbind(dfP,dfP2,dfP3)
+dfP <- rbind(dfP,dfP2,dfP3,dfP4)
 dfP <- data.frame(append(dfP, c(who='P')))
 
-dfM <- read.csv("Youtube_full_stats_frosty.csv")
-dfM2 <- read.csv("Youtube_full_stats_frosty_2.csv")
-dfM3 <- read.csv("Youtube_full_stats_frosty_3.csv")
+dfM <- read.csv("data/Youtube_full_stats_frosty.csv")
+dfM2 <- read.csv("data/Youtube_full_stats_frosty_2.csv")
+dfM3 <- read.csv("data/Youtube_full_stats_frosty_3.csv")
 dfM <- dfM[,-1]
 dfM2 <- dfM2[,-1]
 dfM3 <- dfM3[,-1]
 dfM <- rbind(dfM,dfM2,dfM3)
 dfM <- data.frame(append(dfM, c(who='M')))
 
-dfB <- read.csv("Youtube_full_stats_bindus.csv", sep=";")
-dfB2 <- read.csv("Youtube_full_stats_michal2.csv", sep=";")
-dfB3 <- read.csv("Youtube_full_stats3.csv", sep=";")
+dfB <- read.csv("data/Youtube_full_stats_bindus.csv", sep=";")
+dfB2 <- read.csv("data/Youtube_full_stats_michal2.csv", sep=";")
+dfB3 <- read.csv("data/Youtube_full_stats3.csv", sep=";")
 dfB <- rbind(dfB,dfB2,dfB3)
 dfB <- data.frame(append(dfB, c(who='B')))
-
-
 df <- rbind(dfP,dfM,dfB)
 
 df <- na.omit(df)
@@ -89,7 +88,6 @@ df <- df %>%
 df <- mutate(df, weekday = weekdays(df$time))
 
 
-
 videos_per_channel <- df %>% 
   group_by(channel, who) %>% 
   mutate(number_of_videos = n()) %>% 
@@ -98,7 +96,9 @@ videos_per_channel <- merge(videos_per_channel, df[,c(4,11)], by = 'channel', al
 videos_per_channel <- videos_per_channel[!duplicated(videos_per_channel[c(1,2)]),]
 videos_per_channel <- videos_per_channel[order(df[,'channel'],-df[,'channelSubscribers']),]
 videos_per_channel <- arrange(videos_per_channel, desc(videos_per_channel$number_of_videos))
-
+colnames(videos_per_channel)[3] <- "videos watched"
+videos_per_channel <- videos_per_channel[, c(1,3,4,2)]
+colnames(videos_per_channel)[3] <- "subscribers"
 
 watch_time_per_channel <- aggregate(df$duration, by=list(Category=df$channel), FUN=sum)
 names(watch_time_per_channel) = c("channel", "watchtime")
@@ -106,6 +106,8 @@ watch_time_per_channel <- merge(watch_time_per_channel, df[,c(4,11,12)], by = 'c
 watch_time_per_channel <- watch_time_per_channel[!duplicated(watch_time_per_channel[c(1,2)]),]
 watch_time_per_channel <- watch_time_per_channel[order(df[,'channel'],-df[,'channelSubscribers']),]
 watch_time_per_channel <- arrange(watch_time_per_channel, desc(watch_time_per_channel$watchtime))
+watch_time_per_channel <- mutate(watch_time_per_channel, watchtime = substr(as.character(seconds_to_period(watch_time_per_channel$watchtime)),0,9))
+colnames(watch_time_per_channel)[3] <- "subscribers"
 
 watch_time_per_channelP <- filter(watch_time_per_channel, watch_time_per_channel$who =="P")
 watch_time_per_channelM <- filter(watch_time_per_channel, watch_time_per_channel$who =="M")
@@ -194,16 +196,16 @@ time_pdfP = data.frame(time = as.numeric(24 * (2 * pi + resP$x) / (2 * pi)), # C
 colors <- c(Paweł='#6e0e0a')
 hourPlotP <- ggplot(time_pdfP) +
   geom_area(aes(x = time, y = likelihood, fill = "Paweł"), alpha = 0.5,
-                                            color = 1,    # Line color
-                                            linewidth = 0.5,    # Line width
-                                            linetype = 1) +
+            color = '#6e0e0a',    # Line color
+            linewidth = 1,    # Line width
+            linetype = 1) +
   scale_x_continuous("Hour", labels = 0:24, breaks = 0:24, expand = c(0,0)) +
   scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
   scale_fill_manual("",labels = paste("<span style='color:",
-                                            colors,
-                                            "'>",
-                                            c("Paweł"),
-                                            "</span>"),
+                                      colors,
+                                      "'>",
+                                      c("Paweł"),
+                                      "</span>"),
                     values=colors)+
   theme_classic()+
   theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
@@ -220,8 +222,7 @@ hourPlotP <- ggplot(time_pdfP) +
         panel.background = element_blank(),
         plot.background = element_blank(),
         legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-  
+  guides(fill = guide_legend(byrow = TRUE, override.aes = list(colour = NULL)))
 hourPlotP
 
 datetimesM = dfM$time%>%
@@ -233,28 +234,28 @@ times_in_radiansM = 2 * pi * (times_in_decimalM / 24)
 basic_densM = density(times_in_radiansM, from = 0, to = 2 * pi)
 
 resM = circular::density.circular(circular::circular(times_in_radiansM,
-                                                    type = "angle",
-                                                    units = "radians",
-                                                    rotation = "clock"),
-                                 kernel = "wrappednormal",
-                                 bw = basic_densM$bw)
+                                                     type = "angle",
+                                                     units = "radians",
+                                                     rotation = "clock"),
+                                  kernel = "wrappednormal",
+                                  bw = basic_densM$bw)
 
 time_pdfM = data.frame(time = as.numeric(24 * (2 * pi + resM$x) / (2 * pi)), # Convert from radians back to 24h clock
-                      likelihood = resM$y)
+                       likelihood = resM$y)
 
 colors <- c(Mikołaj='#d74e09')
 hourPlotM <- ggplot(time_pdfM) +
   geom_area(aes(x = time, y = likelihood, fill = "Mikołaj"), alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#d74e09',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   scale_x_continuous("Hour", labels = 0:24, breaks = 0:24, expand = c(0,0)) +
   scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
   scale_fill_manual("",labels = paste("<span style='color:",
-                                            colors,
-                                            "'>",
-                                            c("Mikołaj"),
-                                            "</span>"),
+                                      colors,
+                                      "'>",
+                                      c("Mikołaj"),
+                                      "</span>"),
                     values=colors)+
   theme_classic()+
   theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
@@ -271,7 +272,7 @@ hourPlotM <- ggplot(time_pdfM) +
         panel.background = element_blank(),
         plot.background = element_blank(),
         legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
+  guides(fill = guide_legend(byrow = TRUE, override.aes = list(colour = NULL)))
 
 hourPlotM
 
@@ -296,16 +297,16 @@ time_pdfB = data.frame(time = as.numeric(24 * (2 * pi + resB$x) / (2 * pi)), # C
 colors <- c(Michał='#124e78')
 hourPlotB <- ggplot(time_pdfB) +
   geom_area(aes(x = time, y = likelihood, fill = "Michał"), alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#124e78',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   scale_x_continuous("Hour", labels = 0:24, breaks = 0:24, expand = c(0,0)) +
   scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
   scale_fill_manual("",labels = paste("<span style='color:",
-                                            colors,
-                                            "'>",
-                                            c("Michał"),
-                                            "</span>"),
+                                      colors,
+                                      "'>",
+                                      c("Michał"),
+                                      "</span>"),
                     values=colors)+
   theme_classic()+
   theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
@@ -322,27 +323,26 @@ hourPlotB <- ggplot(time_pdfB) +
         panel.background = element_blank(),
         plot.background = element_blank(),
         legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
+  guides(fill = guide_legend(byrow = TRUE, override.aes = list(colour = NULL)))
 hourPlotB
 
 colors <- c(Mikołaj='#d74e09', Paweł='#6e0e0a')
 hourPlotPM <- ggplot(NULL,aes(x = time, y = likelihood))+
   geom_area(data=time_pdfP, aes(fill = "Paweł"), alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#6e0e0a',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   geom_area(data=time_pdfM, aes(fill = "Mikołaj"), alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#d74e09',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   scale_x_continuous("Hour", labels = 0:24, breaks = 0:24, expand = c(0,0)) +
   scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
   scale_fill_manual("",labels = paste("<span style='color:",
-                                            colors,
-                                            "'>",
-                                            c("Mikołaj","Paweł"),
-                                            "</span>"),
+                                      colors,
+                                      "'>",
+                                      c("Mikołaj","Paweł"),
+                                      "</span>"),
                     values=colors)+
   theme_classic()+
   theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
@@ -359,26 +359,26 @@ hourPlotPM <- ggplot(NULL,aes(x = time, y = likelihood))+
         panel.background = element_blank(),
         plot.background = element_blank(),
         legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
+  guides(fill = guide_legend(byrow = TRUE, override.aes = list(colour = NULL)))
 hourPlotPM
 
 colors <- c(Michał='#124e78', Paweł='#6e0e0a')
 hourPlotPB <- ggplot(NULL,aes(x = time, y = likelihood))+
   geom_area(data=time_pdfP, aes(fill = "Paweł"), alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#6e0e0a',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   geom_area(data=time_pdfB, aes(fill = "Michał"), alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#124e78',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   scale_x_continuous("Hour", labels = 0:24, breaks = 0:24, expand = c(0,0)) +
   scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
   scale_fill_manual("",labels = paste("<span style='color:",
-                                            colors,
-                                            "'>",
-                                            c("Michał","Paweł"),
-                                            "</span>"),
+                                      colors,
+                                      "'>",
+                                      c("Michał","Paweł"),
+                                      "</span>"),
                     values=colors)+
   theme_classic()+
   theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
@@ -395,26 +395,26 @@ hourPlotPB <- ggplot(NULL,aes(x = time, y = likelihood))+
         panel.background = element_blank(),
         plot.background = element_blank(),
         legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
+  guides(fill = guide_legend(byrow = TRUE, override.aes = list(colour = NULL)))
 hourPlotPB
 
 colors <- c(Michał='#124e78', Mikołaj='#d74e09')
 hourPlotMB <- ggplot(NULL,aes(x = time, y = likelihood))+
   geom_area(data=time_pdfM, aes(fill = "Mikołaj"), alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#d74e09',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   geom_area(data=time_pdfB, aes(fill = "Michał"), alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#124e78',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   scale_x_continuous("Hour", labels = 0:24, breaks = 0:24, expand = c(0,0)) +
   scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
   scale_fill_manual("",labels = paste("<span style='color:",
-                                            colors,
-                                            "'>",
-                                            c("Michał","Mikołaj"),
-                                            "</span>"),
+                                      colors,
+                                      "'>",
+                                      c("Michał","Mikołaj"),
+                                      "</span>"),
                     values=colors)+
   theme_classic()+
   theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
@@ -431,30 +431,30 @@ hourPlotMB <- ggplot(NULL,aes(x = time, y = likelihood))+
         panel.background = element_blank(),
         plot.background = element_blank(),
         legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
+  guides(fill = guide_legend(byrow = TRUE, override.aes = list(colour = NULL)))
 hourPlotMB
 
 colors <- c(Michał='#124e78', Mikołaj='#d74e09', Paweł='#6e0e0a')
 hourPlotAll <- ggplot(NULL,aes(x = time, y = likelihood))+
   geom_area(data=time_pdfP, aes(fill='Paweł'),alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#6e0e0a',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   geom_area(data=time_pdfM, aes(fill='Mikołaj'),alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#d74e09',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   geom_area(data=time_pdfB, aes(fill='Michał'), alpha = 0.5,
-            color = 1,    # Line color
-            linewidth = 0.5,    # Line width
+            color = '#124e78',    # Line color
+            linewidth = 1,    # Line width
             linetype = 1) +
   scale_x_continuous("Hour", labels = 0:24, breaks = 0:24, expand = c(0,0)) +
   scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
   scale_fill_manual("",labels = paste("<span style='color:",
-                                            colors,
-                                            "'>",
-                                            c("Michał","Mikołaj","Paweł"),
-                                            "</span>"),
+                                      colors,
+                                      "'>",
+                                      c("Michał","Mikołaj","Paweł"),
+                                      "</span>"),
                     values=colors)+
   theme_classic()+
   theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
@@ -471,8 +471,9 @@ hourPlotAll <- ggplot(NULL,aes(x = time, y = likelihood))+
         panel.background = element_blank(),
         plot.background = element_blank(),
         legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
+  guides(fill = guide_legend(byrow = TRUE, override.aes = list(colour = NULL)))
 hourPlotAll
+
 
 calendarM <- dfM %>%
   mutate(day = substr(time,1,11)) %>% 
@@ -493,457 +494,4 @@ calendarB <- dfB %>%
   rename(date=day)
 
 
-colors <- c(Paweł='#6e0e0a')
-likePlotP <- ggplot(df, aes(x = likes)) +
-  geom_density(data = dfP, aes(fill = "Paweł"),
-               alpha = 0.5)+
-  scale_x_continuous(limits=c(0,10000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors,
-                                      "'>",
-                                      c("Paweł"),
-                                      "</span>"),
-                    values=colors)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-likePlotP
-
-colors <- c(Mikołaj='#d74e09')
-likePlotM <- ggplot(df, aes(x = likes)) +
-  geom_density(data = dfM, aes(fill = "Mikołaj"),
-               alpha = 0.5)+
-  scale_x_continuous(limits=c(0,10000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors,
-                                      "'>",
-                                      c("Mikołaj"),
-                                      "</span>"),
-                    values=colors)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-likePlotM
-
-colors <- c(Michał='#124e78')
-likePlotB <- ggplot(df, aes(x = likes)) +
-  geom_density(data = dfB, aes(fill = "Michał"),
-               alpha = 0.5)+
-  scale_x_continuous(limits=c(0,10000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors,
-                                      "'>",
-                                      c("Michał"),
-                                      "</span>"),
-                    values=colors)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-likePlotB
-
-colors <- c(Mikołaj='#d74e09', Paweł='#6e0e0a')
-likePlotPM <- ggplot(df, aes(x = likes)) +
-  geom_density(data = dfP, aes(fill = "Paweł"),
-               alpha = 0.5)+
-  geom_density(data = dfM, aes(fill = "Mikołaj"),
-               alpha = 0.5)+
-  scale_x_continuous(limits=c(0,10000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors,
-                                      "'>",
-                                      c("Mikołaj", "Paweł"),
-                                      "</span>"),
-                    values=colors)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-likePlotPM
-
-colors2 <- c(Michał='#124e78', Paweł='#6e0e0a')
-likePlotPB <- ggplot(df, aes(x = likes)) +
-  geom_density(data = dfP, aes(fill = "Paweł"),
-             alpha = 0.5)+
-  geom_density(data = dfB, aes(fill = "Michał"),
-               alpha = 0.5)+
-  scale_x_continuous(limits=c(0,20000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors2,
-                                      "'>",
-                                      c("Michał", "Paweł"),
-                                      "</span>"),
-                    values=colors2)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-likePlotPB
-
-colors2 <- c(Michał='#124e78', Mikołaj='#d74e09')
-likePlotMB <- ggplot(df, aes(x = likes)) +
-  geom_density(data = dfM, aes(fill = "Mikołaj"),
-               alpha = 0.5)+
-  geom_density(data = dfB, aes(fill = "Michał"),
-               alpha = 0.5) +
-  scale_x_continuous(limits=c(0,10000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors2,
-                                      "'>",
-                                      c("Michał", "Mikołaj"),
-                                      "</span>"),
-                    values=colors2)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-likePlotMB
-
-colors <- c(Michał='#124e78', Mikołaj='#d74e09', Paweł='#6e0e0a')
-likePlotAll <- ggplot(df, aes(x = likes)) +
-  geom_density(data = dfP, aes(fill = "Paweł"),
-                alpha = 0.5)+
-  geom_density(data = dfM, aes(fill = "Mikołaj"),
-                alpha = 0.5)+
-  geom_density(data = dfB, aes(fill = "Michał"),
-                alpha = 0.5) +
-  scale_x_continuous(limits=c(0,10000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                       colors,
-                                       "'>",
-                                       c("Michał", "Mikołaj", "Paweł"),
-                                       "</span>"),
-                     values=colors)+
-   theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-likePlotAll
-
-colors <- c(Paweł='#6e0e0a')
-viewPlotP <- ggplot(df, aes(x = views)) +
-  geom_density(data = dfP, aes(fill = "Paweł"),
-               alpha = 0.5)+
-  scale_x_continuous(limits=c(0,500000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors,
-                                      "'>",
-                                      c("Paweł"),
-                                      "</span>"),
-                    values=colors)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-viewPlotP
-
-colors <- c(Mikołaj='#d74e09')
-viewPlotM <- ggplot(df, aes(x = views)) +
-  geom_density(data = dfM, aes(fill = "Mikołaj"),
-               alpha = 0.5)+
-  scale_x_continuous(limits=c(0,500000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors,
-                                      "'>",
-                                      c("Mikołaj"),
-                                      "</span>"),
-                    values=colors)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-viewPlotM
-
-colors <- c(Michał='#124e78')
-viewPlotB <- ggplot(df, aes(x = views)) +
-  geom_density(data = dfB, aes(fill = "Michał"),
-               alpha = 0.5)+
-  scale_x_continuous(limits=c(0,500000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors,
-                                      "'>",
-                                      c("Michał"),
-                                      "</span>"),
-                    values=colors)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-viewPlotB
-
-colors <- c(Mikołaj='#d74e09', Paweł='#6e0e0a')
-viewPlotPM <- ggplot(df, aes(x = views)) +
-  geom_density(data = dfP, aes(fill = "Paweł"),
-               alpha = 0.5)+
-  geom_density(data = dfM, aes(fill = "Mikołaj"),
-               alpha = 0.5)+
-  scale_x_continuous(limits=c(0,500000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors,
-                                      "'>",
-                                      c("Mikołaj", "Paweł"),
-                                      "</span>"),
-                    values=colors)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-viewPlotPM
-
-colors <- c(Michał='#124e78', Paweł='#6e0e0a')
-viewPlotPB <- ggplot(df, aes(x = views)) +
-  geom_density(data = dfP, aes(fill = "Paweł"),
-               alpha = 0.5)+
-  geom_density(data = dfB, aes(fill = "Michał"),
-               alpha = 0.5)+
-  scale_x_continuous(limits=c(0,500000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors,
-                                      "'>",
-                                      c("Michał", "Paweł"),
-                                      "</span>"),
-                    values=colors)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-viewPlotPB
-
-colors <- c(Michał='#124e78', Mikołaj='#d74e09')
-viewPlotMB <- ggplot(df, aes(x = views)) +
-  geom_density(data = dfM, aes(fill = "Mikołaj"),
-               alpha = 0.5)+
-  geom_density(data = dfB, aes(fill = "Michał"),
-               alpha = 0.5) +
-  scale_x_continuous(limits=c(0,500000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors,
-                                      "'>",
-                                      c("Michał", "Mikołaj"),
-                                      "</span>"),
-                    values=colors)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-viewPlotMB
-
-colors2 <- c(Michał='#124e78', Mikołaj='#d74e09', Paweł='#6e0e0a')
-viewPlotAll <- ggplot(df, aes(x = views)) +
-  geom_density(data = dfP, aes(fill = "Paweł"),
-               alpha = 0.5)+
-  geom_density(data = dfM, aes(fill = "Mikołaj"),
-               alpha = 0.5)+
-  geom_density(data = dfB, aes(fill = "Michał"),
-               alpha = 0.5) +
-  scale_x_continuous(limits=c(0,800000), expand = c(0,0)) +
-  scale_y_continuous("Likelihood of Data", expand = c(0,0)) +
-  scale_fill_manual("",labels = paste("<span style='color:",
-                                      colors2,
-                                      "'>",
-                                      c("Michał", "Mikołaj", "Paweł"),
-                                      "</span>"),
-                    values=colors2)+
-  theme_classic() +
-  theme(plot.margin = margin(1,1,1,1, unit = 'cm'),
-        axis.title.y = element_blank(),
-        axis.text.y = element_blank(),
-        axis.ticks.y = element_blank(),
-        axis.title.x = element_text(size = 35, color="#ff9933",margin=margin(15,0,0,0)),
-        axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
-        axis.ticks.x = element_line(linewidth = 1.4),
-        legend.spacing.y = unit(1,'cm'),
-        legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
-        legend.text = element_markdown(family='Roboto_condensed',size = 25),
-        legend.title.align = 0.5,
-        panel.background = element_blank(),
-        plot.background = element_blank(),
-        legend.background = element_rect(fill='transparent')) +
-  guides(fill = guide_legend(byrow = TRUE))
-
-viewPlotAll
 

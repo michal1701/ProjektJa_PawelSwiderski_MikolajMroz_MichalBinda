@@ -7,90 +7,80 @@ function(input, output, session) {
   topCreatorsP <- reactive({
     if (input$rankingCriteria == "byWatchtime"){
       if (input$subscriberCountFilter == "all"){
-        topCreatorsP <- DT::datatable(head(watch_time_per_channelP[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),
+        topCreatorsP <- DT::datatable(head(watch_time_per_channelP[,c(1,2,3)],10), 
+                                      selection = 'none',
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
-                                      ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+                                      ),
+                                      rownames = FALSE
+                                      
+        ) %>% formatStyle(columns = c("channel","subscribers","watchtime"), color = "white")
       }
       else if (input$subscriberCountFilter == "underMilion"){
-        topCreatorsP <- DT::datatable(head(filter(watch_time_per_channelP,watch_time_per_channelP$channelSubscribers < 1000000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsP <- DT::datatable(head(filter(watch_time_per_channelP,watch_time_per_channelP$subscribers < 1000000)[,c(1,2,3)],10), 
+                                      selection = 'none',
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","watchtime"), color = "white")
       }
       else {
-        topCreatorsP <- DT::datatable(head(filter(watch_time_per_channelP,watch_time_per_channelP$channelSubscribers < 100000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsP <- DT::datatable(head(filter(watch_time_per_channelP,watch_time_per_channelP$subscribers < 100000)[,c(1,2,3)],10), 
+                                      selection = 'none',
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","watchtime"), color = "white")
       }
     }
     else {
       if (input$subscriberCountFilter == "all"){
-        topCreatorsP <- DT::datatable(head(videos_per_channelP[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),
+        topCreatorsP <- DT::datatable(head(videos_per_channelP[,c(1,2,3)],10), 
+                                      selection = 'none',
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","videos watched"), color = "white")
       }
       else if (input$subscriberCountFilter == "underMilion"){
-        topCreatorsP <- DT::datatable(head(filter(videos_per_channelP,videos_per_channelP$channelSubscribers < 1000000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsP <- DT::datatable(head(filter(videos_per_channelP,videos_per_channelP$subscribers < 1000000)[,c(1,2,3)],10), 
+                                      selection = 'none',                 
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","videos watched"), color = "white")
       }
       else {
-        topCreatorsP <- DT::datatable(head(filter(videos_per_channelP,videos_per_channelP$channelSubscribers < 100000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsP <- DT::datatable(head(filter(videos_per_channelP,videos_per_channelP$subscribers < 100000)[,c(1,2,3)],10), 
+                                      selection = 'none',                
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","videos watched"), color = "white")
       }
     }
     return (topCreatorsP)
@@ -99,90 +89,78 @@ function(input, output, session) {
   topCreatorsM <- reactive({
     if (input$rankingCriteria == "byWatchtime"){
       if (input$subscriberCountFilter == "all"){
-        topCreatorsM <- DT::datatable(head(watch_time_per_channelM[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),
+        topCreatorsM <- DT::datatable(head(watch_time_per_channelM[,c(1,2,3)],10), 
+                                      selection = 'none',
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","watchtime"), color = "white")
       }
       else if (input$subscriberCountFilter == "underMilion"){
-        topCreatorsM <- DT::datatable(head(filter(watch_time_per_channelM,watch_time_per_channelM$channelSubscribers < 1000000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsM <- DT::datatable(head(filter(watch_time_per_channelM,watch_time_per_channelM$subscribers < 1000000)[,c(1,2,3)],10), 
+                                      selection = 'none',               
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","watchtime"), color = "white")
       }
       else {
-        topCreatorsM <- DT::datatable(head(filter(watch_time_per_channelM,watch_time_per_channelM$channelSubscribers < 100000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsM <- DT::datatable(head(filter(watch_time_per_channelM,watch_time_per_channelM$subscribers < 100000)[,c(1,2,3)],10), 
+                                      selection = 'none',                
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","watchtime"), color = "white")
       }
     }
     else {
       if (input$subscriberCountFilter == "all"){
-        topCreatorsM <- DT::datatable(head(videos_per_channelM[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),
+        topCreatorsM <- DT::datatable(head(videos_per_channelM[,c(1,2,3)],10), 
+                                      selection = 'none',
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","videos watched"), color = "white")
       }
       else if (input$subscriberCountFilter == "underMilion"){
-        topCreatorsM <- DT::datatable(head(filter(videos_per_channelM,videos_per_channelM$channelSubscribers < 1000000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsM <- DT::datatable(head(filter(videos_per_channelM,videos_per_channelM$subscribers < 1000000)[,c(1,2,3)],10), 
+                                      selection = 'none',              
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","videos watched"), color = "white")
       }
       else {
-        topCreatorsM <- DT::datatable(head(filter(videos_per_channelM,videos_per_channelM$channelSubscribers < 100000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsM <- DT::datatable(head(filter(videos_per_channelM,videos_per_channelM$subscribers < 100000)[,c(1,2,3)],10), 
+                                      selection = 'none',              
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","videos watched"), color = "white")
       }
     }
     return (topCreatorsM)
@@ -191,94 +169,83 @@ function(input, output, session) {
   topCreatorsB <- reactive({
     if (input$rankingCriteria == "byWatchtime"){
       if (input$subscriberCountFilter == "all"){
-        topCreatorsB <- DT::datatable(head(watch_time_per_channelB[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),
+        topCreatorsB <- DT::datatable(head(watch_time_per_channelB[,c(1,2,3)],10), 
+                                      selection = 'none',
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","watchtime"), color = "white")
       }
       else if (input$subscriberCountFilter == "underMilion"){
-        topCreatorsB <- DT::datatable(head(filter(watch_time_per_channelB,watch_time_per_channelB$channelSubscribers < 1000000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsB <- DT::datatable(head(filter(watch_time_per_channelB,watch_time_per_channelB$subscribers < 1000000)[,c(1,2,3)],10), 
+                                      selection = 'none',               
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","watchtime"), color = "white")
       }
       else {
-        topCreatorsB <- DT::datatable(head(filter(watch_time_per_channelB,watch_time_per_channelB$channelSubscribers < 100000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsB <- DT::datatable(head(filter(watch_time_per_channelB,watch_time_per_channelB$subscribers < 100000)[,c(1,2,3)],10), 
+                                      selection = 'none',               
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","watchtime"), color = "white")
       }
     }
     else {
       if (input$subscriberCountFilter == "all"){
-        topCreatorsB <- DT::datatable(head(videos_per_channelB[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),
+        topCreatorsB <- DT::datatable(head(videos_per_channelB[,c(1,2,3)],10), 
+                                      selection = 'none',
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","videos watched"), color = "white")
       }
       else if (input$subscriberCountFilter == "underMilion"){
-        topCreatorsB <- DT::datatable(head(filter(videos_per_channelB,videos_per_channelB$channelSubscribers < 1000000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsB <- DT::datatable(head(filter(videos_per_channelB,videos_per_channelB$subscribers < 1000000)[,c(1,2,3)],10), 
+                                      selection = 'none',               
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","videos watched"), color = "white")
       }
       else {
-        topCreatorsB <- DT::datatable(head(filter(videos_per_channelB,videos_per_channelB$channelSubscribers < 100000)[,c(1), drop = FALSE],10), 
-                                      selection = list(
-                                        mode = 'single',
-                                        target = 'column'),                 
+        topCreatorsB <- DT::datatable(head(filter(videos_per_channelB,videos_per_channelB$subscribers < 100000)[,c(1,2,3)],10), 
+                                      selection = 'none',                
                                       options = list(
                                         dom = 't',
-                                        headerCallback = JS(
-                                          "function(thead, data, start, end, display){",
-                                          "  $(thead).remove();",
+                                        initComplete = JS(
+                                          "function(settings, json) {",
+                                          "$(this.api().table().header()).css({'color': 'red'});",
                                           "}")
                                       ), rownames = FALSE
-        ) %>% formatStyle(columns ="channel", color = "white")
+        ) %>% formatStyle(columns = c("channel","subscribers","videos watched"), color = "white")
       }
     }
     return (topCreatorsB)
   })
+  
     
   output$topCreatorsP = DT::renderDataTable(topCreatorsP())
   output$topCreatorsM = DT::renderDataTable(topCreatorsM())
@@ -406,7 +373,7 @@ function(input, output, session) {
   
   output$ListOfCharts3 <- renderUI({
     Order <- ChartOrder3()
-    print(Order)
+
     
     ui <- supercaliheatmapwidgetOutput(Order[1], height = "210px")
     class(ui) <- c("shiny.tag.list", "list")
@@ -461,7 +428,7 @@ function(input, output, session) {
       orientation='vertical',
       height="100%"
     ) %>% 
-      cal_legend(show=FALSE, colors = cal_colors(min = "FFCCCC", max = "#FF0000"))
+      cal_legend(show=FALSE, colors = cal_colors(min = "FFCCCC", max = "#ff0000"))
     
   })
   
@@ -607,9 +574,9 @@ function(input, output, session) {
     names[["dfM"]] <- "Mikołaj"
     names[["dfB"]] <- "Michał"
     colors <- hash()
-    colors[["dfB"]] <- '#CCCC00' 
-    colors[["dfM"]] <- '#FF0000'
-    colors[["dfP"]] <- '#4dd2ff'
+    colors[["dfB"]] <- '#124e78' 
+    colors[["dfM"]] <- '#d74e09'
+    colors[["dfP"]] <- '#6e0e0a'
     if (length(input$likeViewPlotFilter) == 3){
       likePlot <- ggplot(df, aes(x = likes)) +
         geom_density(data = get(input$likeViewPlotFilter[1]), aes(fill = names[[input$likeViewPlotFilter[1]]]),
@@ -635,7 +602,7 @@ function(input, output, session) {
               axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
               axis.ticks.x = element_line(linewidth = 1.4),
               legend.spacing.y = unit(1,'cm'),
-              legend.title = element_text(family='Roboto_condensed',size = 28, color='#FF0000'),
+              legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
               legend.text = element_markdown(family='Roboto_condensed',size = 25),
               legend.title.align = 0.5,
               panel.background = element_blank(),
@@ -666,7 +633,7 @@ function(input, output, session) {
               axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
               axis.ticks.x = element_line(linewidth = 1.4),
               legend.spacing.y = unit(1,'cm'),
-              legend.title = element_text(family='Roboto_condensed',size = 28, color='#FF0000'),
+              legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
               legend.text = element_markdown(family='Roboto_condensed',size = 25),
               legend.title.align = 0.5,
               panel.background = element_blank(),
@@ -695,7 +662,7 @@ function(input, output, session) {
               axis.text.x = element_text(size = 22, face='bold', margin=margin(5,0,0,0)),
               axis.ticks.x = element_line(linewidth = 1.4),
               legend.spacing.y = unit(1,'cm'),
-              legend.title = element_text(family='Roboto_condensed',size = 28, color='#FF0000'),
+              legend.title = element_text(family='Roboto_condensed',size = 28, color='#d74e09'),
               legend.text = element_markdown(family='Roboto_condensed',size = 25),
               legend.title.align = 0.5,
               panel.background = element_blank(),
@@ -716,9 +683,9 @@ function(input, output, session) {
     names[["dfM"]] <- "Mikołaj"
     names[["dfB"]] <- "Michał"
     colors <- hash()
-    colors[["dfB"]] <- '#CCCC00' 
-    colors[["dfM"]] <- '#FF0000'
-    colors[["dfP"]] <- '#4dd2ff'
+    colors[["dfB"]] <- '#124e78' 
+    colors[["dfM"]] <- '#d74e09'
+    colors[["dfP"]] <- '#6e0e0a'
     if (length(input$likeViewPlotFilter) == 3){
       viewPlot <- ggplot(df, aes(x = views)) +
         geom_density(data = get(input$likeViewPlotFilter[1]), aes(fill = names[[input$likeViewPlotFilter[1]]]),

@@ -23,52 +23,52 @@ ui <- navbarPage(div(img(src = "logo.png", width = 60, height = 60,class = "img-
            theme = my_theme,
            tabPanel(div("Home", style = "font-size: 30px;"),
                     fluidPage(
-                      h1(
-                       "Top creators",
-                       align = "center",
-                       style = "color: #ff9933" #
-                      ),
                       fluidRow(
                         column(2, align = "center", 
-                          sidebarPanel(
-                            awesomeRadio(
-                              inputId = "subscriberCountFilter",
-                              label = "Subscriber count",
-                              choices = c(
-                                "All" = "all",
-                                "Under 1 Milion" = "underMilion",
-                                "Under 100 thousand" = "under100k"
-                                ),
-                               status = "danger"
-                              ),
-                              width = 200,
-                              align = "left"
-                          ),
-                          sidebarPanel(
-                            awesomeRadio(
-                              inputId = "rankingCriteria",
-                              label = "Ranking Criteria",
-                              choices = c(
-                                "By videos watched" = "byVideos",
-                                "By watchtime" = "byWatchtime"
-                              ),
-                              status = "danger"
-                            ),
-                            width = 200,
-                            align = "left"
-                          )
+                               sidebarPanel(
+                                 awesomeRadio(
+                                   inputId = "subscriberCountFilter",
+                                   label = "Subscriber count",
+                                   choices = c(
+                                     "All" = "all",
+                                     "Under 1 Milion" = "underMilion",
+                                     "Under 100 thousand" = "under100k"
+                                   ),
+                                   status = "danger"
+                                 ),
+                                 width = 200,
+                                 align = "left"
+                               ),
+                               sidebarPanel(
+                                 awesomeRadio(
+                                   inputId = "rankingCriteria",
+                                   label = "Ranking Criteria",
+                                   choices = c(
+                                     "By videos watched" = "byVideos",
+                                     "By watchtime" = "byWatchtime"
+                                   ),
+                                   status = "danger"
+                                 ),
+                                 width = 200,
+                                 align = "left"
+                               )
                         ),
                         column(
-                          10, 
+                          10,
+                          h1(
+                            "Top creators",
+                            align = "center",
+                            style = "color: #ff9933" 
+                          ),
                           align = "center", 
                           style = 'border-left:1px solid #65D36E; padding-right: 30px',
                           fluidRow(
                             column(4, h1("Paweł")),
                             column(4, h1("Mikołaj")),
                             column(4, h1("Michał"))
+                            
+                          ),
                           
-                            ),
-                    
                           fluidRow(
                             column(
                               4,
@@ -89,50 +89,30 @@ ui <- navbarPage(div(img(src = "logo.png", width = 60, height = 60,class = "img-
                           ),
                           tags$br(), tags$br(), tags$br() , tags$br(),
                           fluidRow(
-                            h1("Most Watched"),
+                            h1("Most Watched", style = "color: #ff9933;"),
                             tags$br(), tags$br(), tags$br() , tags$br()
                             
                           ),
                           fluidRow(
                             div(
-                            style = 
-                              "height: 80px; background-color: #121212; width: 100%; position: relative;",
-                            tags$iframe(width="376", height="315", src="https://www.youtube.com/embed/JR9lfJL8ov0", 
-                                        frameBorder="400", allowfullscreen=NA, style = "border: 10px solid #EEE; border-color: #6e0e0a;"),
-                            tags$iframe(width="376", height="315", src="https://www.youtube.com/embed/HMum-XYlZSk", 
-                                        frameBorder="400", allowfullscreen=NA, style = "border: 10px solid #EEE; border-color: #6e0e0a;"),
-                            tags$iframe(width="376", height="315", src="https://www.youtube.com/embed/pILCn6VO_RU", 
-                                        frameBorder="400", allowfullscreen=NA, style = "border: 10px solid #EEE; border-color: #6e0e0a;")
-                          ),
-                          style="text-align:center"
+                              style = 
+                                "height: 80px; background-color: #121212; width: 100%; position: relative;",
+                              tags$iframe(width="376", height="315", src="https://www.youtube.com/embed/JR9lfJL8ov0", 
+                                          frameBorder="400", allowfullscreen=NA, style = "border: 10px solid #EEE; border-color: #6e0e0a;"),
+                              tags$iframe(width="376", height="315", src="https://www.youtube.com/embed/HMum-XYlZSk", 
+                                          frameBorder="400", allowfullscreen=NA, style = "border: 10px solid #EEE; border-color: #6e0e0a;"),
+                              tags$iframe(width="376", height="315", src="https://www.youtube.com/embed/oe8SoCqElGI", 
+                                          frameBorder="400", allowfullscreen=NA, style = "border: 10px solid #EEE; border-color: #6e0e0a;")
+                            ),
+                            style="text-align:center"
                             
                           )
                         )
                       ),
-                      # fluidRow(
-                      #   
-                      #   # column(4, h1("Paweł",
-                      #   #              style = "color: #FFFFFF")),
-                      #   # column(4, h1("Mikołaj",align = "center",
-                      #   #              style = "color: #FFFFFF")),
-                      #   # column(4, h1("Michał",
-                      #   #              style = "color: #FFFFFF")),
-                      #   
-                      # 
-                      # div(
-                      #   style = 
-                      #     "height: 80px; background-color: #121212; width: 100%; position: relative;",
-                      #   tags$iframe(width="400", height="315", src="https://www.youtube.com/embed/JR9lfJL8ov0", 
-                      #               frameborder="200", allowfullscreen=NA),
-                      #   tags$iframe(width="400", height="315", src="https://www.youtube.com/embed/HMum-XYlZSk", 
-                      #               frameborder="200", allowfullscreen=NA),
-                      #   tags$iframe(width="400", height="315", src="https://www.youtube.com/embed/MnmR6Sqh5NQ", 
-                      #               frameborder="200", allowfullscreen=NA)
-                      # ),
-                      # style="text-align:center"),
                     )
                     
            ),
+           
            tabPanel(div("When do we watch", style = "font-size:30px;"),
                     fluidPage(
                       h1(
@@ -208,7 +188,7 @@ ui <- navbarPage(div(img(src = "logo.png", width = 60, height = 60,class = "img-
                        tags$style(HTML(".js-irs-0 .irs-bar,.js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-to,.js-irs-0 .irs-from, .js-irs-0 .irs-grid-pol {background: red}")),
                        tags$style(HTML(".js-irs-1 .irs-bar,.js-irs-1 .irs-single, .js-irs-1 .irs-bar-edge, .js-irs-1 .irs-to,.js-irs-1 .irs-from, .js-irs-1 .irs-grid-pol {background: red}")),
                        h1(
-                         "What we like to watch",
+                         "What do we like to watch",
                          align = "center",
                          style = "color: #ff9933"
                        ),
@@ -273,7 +253,7 @@ ui <- navbarPage(div(img(src = "logo.png", width = 60, height = 60,class = "img-
                 przeglądać podsumowanie swojej aktywności odtwarzania i oglądania przez cały rok.
                 Zawiera ona informacje takie 10 najczęściej oraz najwięcej oglądanych kanałów pod względem liczby subkrybentów danego kanału. 
                 Użytkownicy mogą również sprawdzić gęstość czasu spędzonego na platformie i proporcje liczby filmików w zależności od dnia tygodnia oraz danego dnia w roku.
-                W 3 zakładce można również porównać liczbe oglądanych odcinków biorąc zakres popularności filmików. Całość jest kolorystycznie dostosowana tak jak na poniższej legendzie:
+                W trzeciej zakładce można również porównać liczbe oglądanych odcinków biorąc zakres popularności filmików. Całość jest kolorystycznie dostosowana tak jak na poniższej legendzie:
                   ", align = "center", style = "color: white" ),
                
                fluidRow(
@@ -291,24 +271,14 @@ ui <- navbarPage(div(img(src = "logo.png", width = 60, height = 60,class = "img-
                    ),
                    fluidRow(
                      
-                     column(4, img(src = "ikona1.png", width = 300, height = 300)),
+                     column(4, img(src = "ikona3.png", width = 300, height = 300)),
                      
                      column(4, img(src = "ikona2.png", width = 300, height = 300)),
                      
-                     column(4, img(src = "ikona3.png", width = 300, height = 300))
+                     column(4, img(src = "ikona1.png", width = 300, height = 300))
                    )
-                     ))),
-      footer = shiny::HTML("
-                  <footer class='text-center text-sm-start' style='width:100%;'>
-                  <hr>
-                  <p class='text-center' style='font-size:12px;'>
-                    © 2022 Autorzy:
-                    <a class='text-dark' href='https://github.com/gogolon%27%3EJakub Lange</a>,
-                    <a class='text-dark' href='https://github.com/Koliber216%27%3EMateusz Kubita</a>,
-                    <a class='text-dark' href='https://github.com/AKapich%27%3EAleks Kapich</a>
-                  </p>
-                  </footer>
-                  "),
+                     )))
+      
                
 )
 
