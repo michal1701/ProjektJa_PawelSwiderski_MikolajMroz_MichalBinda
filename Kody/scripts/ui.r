@@ -21,7 +21,7 @@ my_theme <- bs_theme(
 ui <- navbarPage(div(img(src = "logo.png", width = 60, height = 60,class = "img-responsive"), align = "left","Youtube wrapped",style="font-size: 30px;width:400px; margin:20 auto;",class="moving right"),
                  # title = "Youtube wrapped",
            theme = my_theme,
-           tabPanel(div("Home", style = "font-size: 30px; color: white; background-color: #6e0e0a;"),
+           tabPanel(div("Home", style = "font-size: 30px;"),
                     fluidPage(
                       h1(
                        "Top creators",
@@ -85,33 +85,55 @@ ui <- navbarPage(div(img(src = "logo.png", width = 60, height = 60,class = "img-
                               align = "center",
                               DT::dataTableOutput("topCreatorsB")
                             )
+                            
+                          ),
+                          tags$br(), tags$br(), tags$br() , tags$br(),
+                          fluidRow(
+                            h1("Most Watched"),
+                            tags$br(), tags$br(), tags$br() , tags$br()
+                            
+                          ),
+                          fluidRow(
+                            div(
+                            style = 
+                              "height: 80px; background-color: #121212; width: 100%; position: relative;",
+                            tags$iframe(width="376", height="315", src="https://www.youtube.com/embed/JR9lfJL8ov0", 
+                                        frameBorder="400", allowfullscreen=NA, style = "border: 10px solid #EEE; border-color: #6e0e0a;"),
+                            tags$iframe(width="376", height="315", src="https://www.youtube.com/embed/HMum-XYlZSk", 
+                                        frameBorder="400", allowfullscreen=NA, style = "border: 10px solid #EEE; border-color: #6e0e0a;"),
+                            tags$iframe(width="376", height="315", src="https://www.youtube.com/embed/pILCn6VO_RU", 
+                                        frameBorder="400", allowfullscreen=NA, style = "border: 10px solid #EEE; border-color: #6e0e0a;")
+                          ),
+                          style="text-align:center"
+                            
                           )
                         )
                       ),
-                      fluidRow(
-                        column(4, h1("Paweł",
-                                     style = "color: #FFFFFF")),
-                        column(4, h1("Mikołaj",align = "center",
-                                     style = "color: #FFFFFF")),
-                        column(4, h1("Michał",
-                                     style = "color: #FFFFFF")),
-                        
-                      
-                      div(
-                        style = 
-                          "height: 80px; background-color: #121212; width: 100%; position: relative;",
-                        tags$iframe(width="400", height="315", src="https://www.youtube.com/embed/JR9lfJL8ov0", 
-                                    frameborder="200", allowfullscreen=NA),
-                        tags$iframe(width="400", height="315", src="https://www.youtube.com/embed/HMum-XYlZSk", 
-                                    frameborder="200", allowfullscreen=NA),
-                        tags$iframe(width="400", height="315", src="https://www.youtube.com/embed/MnmR6Sqh5NQ", 
-                                    frameborder="200", allowfullscreen=NA)
-                      ),
-                      style="text-align:center"),
+                      # fluidRow(
+                      #   
+                      #   # column(4, h1("Paweł",
+                      #   #              style = "color: #FFFFFF")),
+                      #   # column(4, h1("Mikołaj",align = "center",
+                      #   #              style = "color: #FFFFFF")),
+                      #   # column(4, h1("Michał",
+                      #   #              style = "color: #FFFFFF")),
+                      #   
+                      # 
+                      # div(
+                      #   style = 
+                      #     "height: 80px; background-color: #121212; width: 100%; position: relative;",
+                      #   tags$iframe(width="400", height="315", src="https://www.youtube.com/embed/JR9lfJL8ov0", 
+                      #               frameborder="200", allowfullscreen=NA),
+                      #   tags$iframe(width="400", height="315", src="https://www.youtube.com/embed/HMum-XYlZSk", 
+                      #               frameborder="200", allowfullscreen=NA),
+                      #   tags$iframe(width="400", height="315", src="https://www.youtube.com/embed/MnmR6Sqh5NQ", 
+                      #               frameborder="200", allowfullscreen=NA)
+                      # ),
+                      # style="text-align:center"),
                     )
                     
            ),
-           tabPanel(div("When do we watch", style = "font-size:30px; color: white; background-color: #6e0e0a;"),
+           tabPanel(div("When do we watch", style = "font-size:30px;"),
                     fluidPage(
                       h1(
                       "Time of the day",
@@ -181,7 +203,7 @@ ui <- navbarPage(div(img(src = "logo.png", width = 60, height = 60,class = "img-
                 )
               )      
            ),
-            tabPanel(div("Likes and views", style = "font-size: 30px; color: white; background-color: #6e0e0a;"),
+            tabPanel(div("Likes and views", style = "font-size: 30px;"),
                      fluidPage(
                        tags$style(HTML(".js-irs-0 .irs-bar,.js-irs-0 .irs-single, .js-irs-0 .irs-bar-edge, .js-irs-0 .irs-to,.js-irs-0 .irs-from, .js-irs-0 .irs-grid-pol {background: red}")),
                        tags$style(HTML(".js-irs-1 .irs-bar,.js-irs-1 .irs-single, .js-irs-1 .irs-bar-edge, .js-irs-1 .irs-to,.js-irs-1 .irs-from, .js-irs-1 .irs-grid-pol {background: red}")),
@@ -245,9 +267,9 @@ ui <- navbarPage(div(img(src = "logo.png", width = 60, height = 60,class = "img-
             )
                       
       ),
-      tabPanel(div("About", style = "font-size: 30px; color: white; background-color: #6e0e0a;"),
+      tabPanel(div("About", style = "font-size: 30px;"),
                
-               h3("YouTube Wrapped to aplikacja bazująca na platformie YouTube, która pozwala użytkownikom
+               h4("YouTube Wrapped to aplikacja bazująca na platformie YouTube, która pozwala użytkownikom
                 przeglądać podsumowanie swojej aktywności odtwarzania i oglądania przez cały rok.
                 Zawiera ona informacje takie 10 najczęściej oraz najwięcej oglądanych kanałów pod względem liczby subkrybentów danego kanału. 
                 Użytkownicy mogą również sprawdzić gęstość czasu spędzonego na platformie i proporcje liczby filmików w zależności od dnia tygodnia oraz danego dnia w roku.
